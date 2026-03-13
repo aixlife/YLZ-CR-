@@ -11,22 +11,26 @@ import {
 } from "@/lib/dummy-data";
 import type { Client, PipelineStage } from "@/types";
 
+export const revalidate = 30;
+
 export default async function PipelinePage() {
   let stages: PipelineStage[] = [];
   let clients: Client[] = [];
 
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
-    const { data: s } = await supabase
-      .from("pipeline_stages")
-      .select("*")
-      .order("display_order");
-    const { data: c } = await supabase
-      .from("clients")
-      .select(
-        "*, stage:pipeline_stages(*), tags:client_tags(*, option:tag_options(*, category:tag_categories(*)))"
-      )
-      .order("stage_order");
+    const [{ data: s }, { data: c }] = await Promise.all([
+      supabase
+        .from("pipeline_stages")
+        .select("*")
+        .order("display_order"),
+      supabase
+        .from("clients")
+        .select(
+          "*, stage:pipeline_stages(*), tags:client_tags(*, option:tag_options(*, category:tag_categories(*)))"
+        )
+        .order("stage_order"),
+    ]);
     stages = (s as PipelineStage[]) || [];
     clients = (c as Client[]) || [];
   } else {

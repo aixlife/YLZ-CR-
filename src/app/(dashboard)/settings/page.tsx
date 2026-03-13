@@ -9,20 +9,24 @@ import {
 } from "@/lib/dummy-data";
 import type { PipelineStage, TagCategory, TagOption } from "@/types";
 
+export const revalidate = 30;
+
 export default async function SettingsPage() {
   let stages: PipelineStage[] = [];
   let tagCategories: (TagCategory & { options: TagOption[] })[] = [];
 
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
-    const { data: s } = await supabase
-      .from("pipeline_stages")
-      .select("*")
-      .order("display_order");
-    const { data: tc } = await supabase
-      .from("tag_categories")
-      .select("*, options:tag_options(*)")
-      .order("display_order");
+    const [{ data: s }, { data: tc }] = await Promise.all([
+      supabase
+        .from("pipeline_stages")
+        .select("*")
+        .order("display_order"),
+      supabase
+        .from("tag_categories")
+        .select("*, options:tag_options(*)")
+        .order("display_order"),
+    ]);
     stages = (s as PipelineStage[]) || [];
     tagCategories = (tc as (TagCategory & { options: TagOption[] })[]) || [];
   } else {
