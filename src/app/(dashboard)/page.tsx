@@ -1,6 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-
-export const revalidate = 30;
 import { PageHeader } from "@/components/layout/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentClients } from "@/components/dashboard/recent-clients";
