@@ -33,24 +33,8 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-  const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/signup");
-
-  if (!user && !isAuthPage) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
-  if (user && isAuthPage) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
-  }
+  // 세션 토큰 갱신 (로그인 리다이렉트 비활성화 — 1인 사용 모드)
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
