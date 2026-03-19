@@ -43,10 +43,31 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
     client?.tags?.map((t) => t.option_id) || []
   );
 
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
   const isEditing = !!client;
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  };
+
+  const validate = () => {
+    const newErrors: Record<string, boolean> = {};
+    if (!formData.company_name.trim()) newErrors.company_name = true;
+    if (!formData.contact_name.trim()) newErrors.contact_name = true;
+    if (!formData.phone.trim()) newErrors.phone = true;
+    if (!formData.email.trim()) newErrors.email = true;
+    if (!formData.stage_id) newErrors.stage_id = true;
+    if (!formData.inquiry_type) newErrors.inquiry_type = true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     setLoading(true);
     const supabase = createClient();
 
@@ -159,83 +180,102 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
               <Input
                 id="company_name"
                 value={formData.company_name}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, company_name: e.target.value }))
-                }
+                onChange={(e) => {
+                  setFormData((p) => ({ ...p, company_name: e.target.value }));
+                  if (e.target.value.trim()) setErrors((p) => ({ ...p, company_name: false }));
+                }}
                 placeholder="회사명을 입력하세요"
-                required
+                className={errors.company_name ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {errors.company_name && <p className="text-xs text-red-500">회사명을 입력하세요</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contact_name">담당자</Label>
+              <Label htmlFor="contact_name">담당자 *</Label>
               <Input
                 id="contact_name"
                 value={formData.contact_name}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, contact_name: e.target.value }))
-                }
+                onChange={(e) => {
+                  setFormData((p) => ({ ...p, contact_name: e.target.value }));
+                  if (e.target.value.trim()) setErrors((p) => ({ ...p, contact_name: false }));
+                }}
                 placeholder="담당자명"
+                className={errors.contact_name ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {errors.contact_name && <p className="text-xs text-red-500">담당자를 입력하세요</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">전화번호</Label>
+              <Label htmlFor="phone">전화번호 *</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, phone: e.target.value }))
-                }
+                onChange={(e) => {
+                  const formatted = formatPhone(e.target.value);
+                  setFormData((p) => ({ ...p, phone: formatted }));
+                  if (formatted.trim()) setErrors((p) => ({ ...p, phone: false }));
+                }}
                 placeholder="010-0000-0000"
+                className={errors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {errors.phone && <p className="text-xs text-red-500">전화번호를 입력하세요</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">이메일</Label>
+              <Label htmlFor="email">이메일 *</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, email: e.target.value }))
-                }
+                onChange={(e) => {
+                  setFormData((p) => ({ ...p, email: e.target.value }));
+                  if (e.target.value.trim()) setErrors((p) => ({ ...p, email: false }));
+                }}
                 placeholder="name@example.com"
+                className={errors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {errors.email && <p className="text-xs text-red-500">이메일을 입력하세요</p>}
             </div>
             <div className="space-y-2">
-              <Label>파이프라인 단계</Label>
+              <Label>파이프라인 단계 *</Label>
               <Select
                 value={formData.stage_id}
                 onValueChange={(v) => {
-                  if (v) setFormData((p) => ({ ...p, stage_id: v }));
+                  if (v) {
+                    setFormData((p) => ({ ...p, stage_id: v }));
+                    setErrors((p) => ({ ...p, stage_id: false }));
+                  }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className={errors.stage_id ? "border-red-500 focus:ring-red-500" : ""}>
                   <SelectValue placeholder="단계 선택" />
                 </SelectTrigger>
                 <SelectContent>
                   {stages.map((stage) => (
                     <SelectItem key={stage.id} value={stage.id}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-2.5 w-2.5 rounded-full"
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="inline-block h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: stage.color }}
                         />
                         {stage.name}
-                      </div>
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {errors.stage_id && <p className="text-xs text-red-500">파이프라인 단계를 선택하세요</p>}
             </div>
             <div className="space-y-2">
-              <Label>문의 유형</Label>
+              <Label>문의 유형 *</Label>
               <Select
                 value={formData.inquiry_type}
                 onValueChange={(v) => {
-                  if (v) setFormData((p) => ({ ...p, inquiry_type: v }));
+                  if (v) {
+                    setFormData((p) => ({ ...p, inquiry_type: v }));
+                    setErrors((p) => ({ ...p, inquiry_type: false }));
+                  }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger className={errors.inquiry_type ? "border-red-500 focus:ring-red-500" : ""}>
                   <SelectValue placeholder="문의 유형 선택" />
                 </SelectTrigger>
                 <SelectContent>
@@ -246,6 +286,7 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.inquiry_type && <p className="text-xs text-red-500">문의 유형을 선택하세요</p>}
             </div>
           </div>
 
