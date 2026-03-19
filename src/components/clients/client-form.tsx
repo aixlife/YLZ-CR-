@@ -237,7 +237,7 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
             <div className="space-y-2">
               <Label>파이프라인 단계 *</Label>
               <Select
-                value={formData.stage_id}
+                value={formData.stage_id || undefined}
                 onValueChange={(v) => {
                   if (v) {
                     setFormData((p) => ({ ...p, stage_id: v }));
@@ -246,18 +246,14 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
                 }}
               >
                 <SelectTrigger className={errors.stage_id ? "border-red-500 focus:ring-red-500" : ""}>
-                  <SelectValue placeholder="단계 선택" />
+                  {formData.stage_id
+                    ? <span>{stages.find((s) => s.id === formData.stage_id)?.name || "단계 선택"}</span>
+                    : <span className="text-muted-foreground">단계 선택</span>}
                 </SelectTrigger>
                 <SelectContent>
                   {stages.map((stage) => (
                     <SelectItem key={stage.id} value={stage.id}>
-                      <span className="inline-flex items-center gap-2">
-                        <span
-                          className="inline-block h-2.5 w-2.5 rounded-full"
-                          style={{ backgroundColor: stage.color }}
-                        />
-                        {stage.name}
-                      </span>
+                      {stage.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
