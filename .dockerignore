@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.gitignore
+*.md
+.env*
+.vercel
+.claude
+.serena
+.agent
+.agents
+.kiro
+Dockerfile
+.dockerignore

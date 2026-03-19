@@ -16,6 +16,7 @@ export async function createClient() {
     supabaseUrl!,
     supabaseKey!,
     {
+      db: { schema: "ylz_crm" },
       cookies: {
         getAll() {
           return cookieStore.getAll();

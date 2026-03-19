@@ -9,7 +9,9 @@ export function createClient() {
     return createMockClient();
   }
 
-  return createBrowserClient(supabaseUrl!, supabaseKey!);
+  return createBrowserClient(supabaseUrl!, supabaseKey!, {
+    db: { schema: "ylz_crm" },
+  });
 }
 
 function createMockClient() {
