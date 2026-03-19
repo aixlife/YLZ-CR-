@@ -1,29 +1,22 @@
 # Cloud Build → Cloud Run 자동 배포
 # 트리거: GitHub push to main
+# 트리거 설정에서 _NEXT_PUBLIC_SUPABASE_URL, _NEXT_PUBLIC_SUPABASE_ANON_KEY 값 설정 필요
 substitutions:
   _SERVICE_NAME: ylz-crm
   _REGION: asia-northeast3
   _REPOSITORY: docker-repo
-
-availableSecrets:
-  secretManager:
-    - versionName: projects/${PROJECT_ID}/secrets/YLZ_CRM_SUPABASE_URL/versions/latest
-      env: NEXT_PUBLIC_SUPABASE_URL
-    - versionName: projects/${PROJECT_ID}/secrets/YLZ_CRM_SUPABASE_ANON_KEY/versions/latest
-      env: NEXT_PUBLIC_SUPABASE_ANON_KEY
+  _NEXT_PUBLIC_SUPABASE_URL: ""
+  _NEXT_PUBLIC_SUPABASE_ANON_KEY: ""
 
 steps:
-  # 1. Build Docker image (NEXT_PUBLIC_* injected from Secret Manager at build time)
+  # 1. Build Docker image (NEXT_PUBLIC_* injected via substitution variables)
   - name: "gcr.io/cloud-builders/docker"
-    secretEnv:
-      - NEXT_PUBLIC_SUPABASE_URL
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY
     args:
       - "build"
       - "--build-arg"
-      - "NEXT_PUBLIC_SUPABASE_URL=$$NEXT_PUBLIC_SUPABASE_URL"
+      - "NEXT_PUBLIC_SUPABASE_URL=${_NEXT_PUBLIC_SUPABASE_URL}"
       - "--build-arg"
-      - "NEXT_PUBLIC_SUPABASE_ANON_KEY=$$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      - "NEXT_PUBLIC_SUPABASE_ANON_KEY=${_NEXT_PUBLIC_SUPABASE_ANON_KEY}"
       - "-t"
       - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY}/${_SERVICE_NAME}:${COMMIT_SHA}"
       - "-t"
