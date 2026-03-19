@@ -237,7 +237,7 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
             <div className="space-y-2">
               <Label>파이프라인 단계 *</Label>
               <Select
-                value={formData.stage_id || undefined}
+                value={formData.stage_id}
                 onValueChange={(v) => {
                   if (v) {
                     setFormData((p) => ({ ...p, stage_id: v }));
