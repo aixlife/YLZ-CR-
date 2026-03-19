@@ -37,6 +37,7 @@ export interface Client {
   contact_name: string | null;
   phone: string | null;
   email: string | null;
+  inquiry_type?: string | null;
   memo: string | null;
   stage_id: string;
   stage_order: number;
@@ -57,9 +58,12 @@ export const DEFAULT_STAGES = [
   { name: "문의", color: "#3EA2FF", display_order: 0 },
   { name: "미팅", color: "#FF8B49", display_order: 1 },
   { name: "계약", color: "#5E6EFF", display_order: 2 },
-  { name: "진행 중", color: "#16C93D", display_order: 3 },
-  { name: "계약 연장", color: "#995AFF", display_order: 4 },
+  { name: "계약 완료", color: "#FF6B9D", display_order: 3 },
+  { name: "진행 중", color: "#16C93D", display_order: 4 },
+  { name: "계약 연장", color: "#995AFF", display_order: 5 },
 ] as const;
+
+export const INQUIRY_TYPES = ["챌린지", "코칭", "컨설팅", "대행"] as const;
 
 export const DEFAULT_TAG_CATEGORIES = [
   {
