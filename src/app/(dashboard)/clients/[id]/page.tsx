@@ -16,6 +16,8 @@ import {
 } from "@/lib/dummy-data";
 import type { Client, PipelineStage, TagCategory, TagOption } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ edit?: string }>;
