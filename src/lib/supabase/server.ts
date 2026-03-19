@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const isConfigured = supabaseUrl?.startsWith("http") && !!supabaseKey;
 
 export async function createClient() {
@@ -30,6 +31,28 @@ export async function createClient() {
             // Server Component에서 호출 시 무시
           }
         },
+      },
+    }
+  );
+}
+
+/**
+ * RLS를 우회하는 Admin 클라이언트 (서버 전용)
+ * 파이프라인 단계, 태그 등 공용 데이터 조회에 사용
+ */
+export function createAdminClient() {
+  if (!isConfigured || !serviceRoleKey) {
+    return createMockClient();
+  }
+
+  return createServerClient(
+    supabaseUrl!,
+    serviceRoleKey,
+    {
+      db: { schema: "ylz_crm" },
+      cookies: {
+        getAll() { return []; },
+        setAll() {},
       },
     }
   );

@@ -37,7 +37,7 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
     email: client?.email || "",
     inquiry_type: client?.inquiry_type || "",
     memo: client?.memo || "",
-    stage_id: client?.stage_id || stages[0]?.id || "",
+    stage_id: client?.stage_id || "",
   });
   const [selectedTags, setSelectedTags] = useState<string[]>(
     client?.tags?.map((t) => t.option_id) || []
@@ -70,7 +70,7 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
           email: formData.email || null,
           inquiry_type: formData.inquiry_type || null,
           memo: formData.memo || null,
-          stage_id: formData.stage_id,
+          stage_id: formData.stage_id || null,
         })
         .eq("id", client.id);
 
@@ -105,7 +105,7 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
           email: formData.email || null,
           inquiry_type: formData.inquiry_type || null,
           memo: formData.memo || null,
-          stage_id: formData.stage_id,
+          stage_id: formData.stage_id || null,
           stage_order: 0,
         })
         .select()
@@ -178,6 +178,18 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="email">이메일</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, email: e.target.value }))
+                }
+                placeholder="name@example.com"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="phone">전화번호</Label>
               <Input
                 id="phone"
@@ -190,39 +202,25 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">이메일</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, email: e.target.value }))
-                }
-                placeholder="name@example.com"
-              />
+              <Label>문의 유형</Label>
+              <Select
+                value={formData.inquiry_type}
+                onValueChange={(v) => {
+                  if (v) setFormData((p) => ({ ...p, inquiry_type: v }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="문의 유형 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {INQUIRY_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </div>
-
-          {/* Inquiry Type */}
-          <div className="space-y-2">
-            <Label>문의 유형</Label>
-            <Select
-              value={formData.inquiry_type}
-              onValueChange={(v) => {
-                if (v) setFormData((p) => ({ ...p, inquiry_type: v }));
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="문의 유형 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                {INQUIRY_TYPES.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Stage Select */}
