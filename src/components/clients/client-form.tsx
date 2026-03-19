@@ -178,6 +178,18 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="phone">전화번호</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, phone: e.target.value }))
+                }
+                placeholder="010-0000-0000"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="email">이메일</Label>
               <Input
                 id="email"
@@ -190,16 +202,30 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">전화번호</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, phone: e.target.value }))
-                }
-                placeholder="010-0000-0000"
-              />
+              <Label>파이프라인 단계</Label>
+              <Select
+                value={formData.stage_id}
+                onValueChange={(v) => {
+                  if (v) setFormData((p) => ({ ...p, stage_id: v }));
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="단계 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {stages.map((stage) => (
+                    <SelectItem key={stage.id} value={stage.id}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: stage.color }}
+                        />
+                        {stage.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>문의 유형</Label>
@@ -221,34 +247,6 @@ export function ClientForm({ client, stages, tagCategories }: ClientFormProps) {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          {/* Stage Select */}
-          <div className="space-y-2">
-            <Label>파이프라인 단계</Label>
-            <Select
-              value={formData.stage_id}
-              onValueChange={(v) => {
-                if (v) setFormData((p) => ({ ...p, stage_id: v }));
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="단계 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                {stages.map((stage) => (
-                  <SelectItem key={stage.id} value={stage.id}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: stage.color }}
-                      />
-                      {stage.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Tags */}
