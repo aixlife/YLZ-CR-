@@ -7,7 +7,7 @@ import Link from "next/link";
 import { isSupabaseConfigured, getDummyClients } from "@/lib/dummy-data";
 import type { Client } from "@/types";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 
 export default async function ClientsPage() {
   let clients: Client[] = [];

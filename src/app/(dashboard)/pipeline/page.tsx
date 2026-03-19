@@ -11,7 +11,7 @@ import {
 } from "@/lib/dummy-data";
 import type { Client, PipelineStage } from "@/types";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 
 export default async function PipelinePage() {
   let stages: PipelineStage[] = [];

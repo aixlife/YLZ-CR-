@@ -9,7 +9,7 @@ import {
 } from "@/lib/dummy-data";
 import type { PipelineStage, TagCategory, TagOption } from "@/types";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   let stages: PipelineStage[] = [];

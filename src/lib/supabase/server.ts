@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const isConfigured = supabaseUrl?.startsWith("http") && !!supabaseKey;
 
 export async function createClient() {
@@ -41,13 +40,14 @@ export async function createClient() {
  * 파이프라인 단계, 태그 등 공용 데이터 조회에 사용
  */
 export function createAdminClient() {
-  if (!isConfigured || !serviceRoleKey) {
+  const runtimeServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!isConfigured || !runtimeServiceRoleKey) {
     return createMockClient();
   }
 
   return createServerClient(
     supabaseUrl!,
-    serviceRoleKey,
+    runtimeServiceRoleKey,
     {
       db: { schema: "ylz_crm" },
       cookies: {
