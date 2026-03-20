@@ -34,8 +34,27 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // 세션 토큰 갱신 (로그인 리다이렉트 비활성화 — 1인 사용 모드)
-  await supabase.auth.getUser();
+  // 세션 토큰 갱신 및 인증 확인
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/signup");
+
+  // 비로그인 상태에서 보호된 페이지 접근 시 로그인으로 리다이렉트
+  if (!user && !isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // 로그인 상태에서 auth 페이지 접근 시 대시보드로 리다이렉트
+  if (user && isAuthRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }

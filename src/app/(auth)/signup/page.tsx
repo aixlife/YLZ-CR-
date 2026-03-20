@@ -24,15 +24,29 @@ export default function SignupPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: { name },
+        emailRedirectTo: undefined,
+      },
     });
     if (error) {
       toast.error("회원가입 실패", { description: error.message });
     } else {
-      toast.success("회원가입 완료", {
-        description: "이메일 확인 후 로그인해주세요.",
+      // 이메일 인증 비활성화 — 가입 후 바로 로그인 시도
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      router.push("/login");
+      if (loginError) {
+        toast.success("회원가입 완료", {
+          description: "로그인 페이지에서 로그인해주세요.",
+        });
+        router.push("/login");
+      } else {
+        toast.success("회원가입 완료");
+        router.push("/");
+        router.refresh();
+      }
     }
     setLoading(false);
   };
