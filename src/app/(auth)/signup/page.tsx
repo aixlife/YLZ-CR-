@@ -21,18 +21,22 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { name },
-        emailRedirectTo: undefined,
       },
     });
     if (error) {
       toast.error("회원가입 실패", { description: error.message });
+    } else if (data.session) {
+      // 이메일 인증 비활성화 상태 — 세션이 바로 반환됨
+      toast.success("회원가입 완료");
+      router.push("/");
+      router.refresh();
     } else {
-      // 이메일 인증 비활성화 — 가입 후 바로 로그인 시도
+      // 이메일 인증 활성화 상태이거나 세션이 없는 경우 — 로그인 시도
       const { error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
