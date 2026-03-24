@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { PipelineStageManager } from "@/components/settings/pipeline-stage-manager";
 import { TagCategoryManager } from "@/components/settings/tag-category-manager";
@@ -16,13 +16,13 @@ export default async function SettingsPage() {
   let tagCategories: (TagCategory & { options: TagOption[] })[] = [];
 
   if (isSupabaseConfigured()) {
-    const supabase = await createClient();
+    const adminClient = createAdminClient();
     const [{ data: s }, { data: tc }] = await Promise.all([
-      supabase
+      adminClient
         .from("pipeline_stages")
         .select("*")
         .order("display_order"),
-      supabase
+      adminClient
         .from("tag_categories")
         .select("*, options:tag_options(*)")
         .order("display_order"),

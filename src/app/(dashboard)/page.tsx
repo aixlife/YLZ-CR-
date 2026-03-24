@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { RecentClients } from "@/components/dashboard/recent-clients";
@@ -17,13 +17,13 @@ export default async function DashboardPage() {
   let allStages: PipelineStage[] = [];
 
   if (isSupabaseConfigured()) {
-    const supabase = await createClient();
+    const adminClient = createAdminClient();
     const [{ data: clients }, { data: stages }] = await Promise.all([
-      supabase
+      adminClient
         .from("clients")
         .select("*, stage:pipeline_stages(*), tags:client_tags(*, option:tag_options(*, category:tag_categories(*)))")
         .order("created_at", { ascending: false }),
-      supabase
+      adminClient
         .from("pipeline_stages")
         .select("*")
         .order("display_order"),

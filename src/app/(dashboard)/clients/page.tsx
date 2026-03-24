@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { ClientTable } from "@/components/clients/client-table";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,8 @@ export default async function ClientsPage() {
   let clients: Client[] = [];
 
   if (isSupabaseConfigured()) {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const adminClient = createAdminClient();
+    const { data } = await adminClient
       .from("clients")
       .select(
         "*, stage:pipeline_stages(*), tags:client_tags(*, option:tag_options(*, category:tag_categories(*)))"

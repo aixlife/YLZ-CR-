@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { ClientForm } from "@/components/clients/client-form";
 import {
@@ -15,12 +15,12 @@ export default async function NewClientPage() {
   let tagCategories: (TagCategory & { options: TagOption[] })[] = [];
 
   if (isSupabaseConfigured()) {
-    const supabase = await createClient();
-    const { data: s } = await supabase
+    const adminClient = createAdminClient();
+    const { data: s } = await adminClient
       .from("pipeline_stages")
       .select("*")
       .order("display_order");
-    const { data: tc } = await supabase
+    const { data: tc } = await adminClient
       .from("tag_categories")
       .select("*, options:tag_options(*)")
       .order("display_order");
