@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { KanbanBoard } from "@/components/pipeline/kanban-board";
 import { Button } from "@/components/ui/button";
@@ -18,13 +18,13 @@ export default async function PipelinePage() {
   let clients: Client[] = [];
 
   if (isSupabaseConfigured()) {
-    const adminClient = createAdminClient();
+    const supabase = await createClient();
     const [{ data: s }, { data: c }] = await Promise.all([
-      adminClient
+      supabase
         .from("pipeline_stages")
         .select("*")
         .order("display_order"),
-      adminClient
+      supabase
         .from("clients")
         .select(
           "*, stage:pipeline_stages(*), tags:client_tags(*, option:tag_options(*, category:tag_categories(*)))"

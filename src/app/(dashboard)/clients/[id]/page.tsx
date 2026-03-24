@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { ClientForm } from "@/components/clients/client-form";
@@ -30,8 +30,8 @@ export default async function ClientDetailPage({ params, searchParams }: PagePro
   let client: Client | null = null;
 
   if (isSupabaseConfigured()) {
-    const adminClient = createAdminClient();
-    const { data } = await adminClient
+    const supabase = await createClient();
+    const { data } = await supabase
       .from("clients")
       .select(
         "*, stage:pipeline_stages(*), tags:client_tags(*, option:tag_options(*, category:tag_categories(*)))"
@@ -53,12 +53,12 @@ export default async function ClientDetailPage({ params, searchParams }: PagePro
     let tagCategories: (TagCategory & { options: TagOption[] })[] = [];
 
     if (isSupabaseConfigured()) {
-      const editAdminClient = createAdminClient();
-      const { data: s } = await editAdminClient
+      const editClient = await createClient();
+      const { data: s } = await editClient
         .from("pipeline_stages")
         .select("*")
         .order("display_order");
-      const { data: tc } = await editAdminClient
+      const { data: tc } = await editClient
         .from("tag_categories")
         .select("*, options:tag_options(*)")
         .order("display_order");
