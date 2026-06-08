@@ -1,14 +1,16 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
 # GCP Cloud Run 프로젝트 초기 설정 스크립트
-# 사용법: ./scripts/setup-gcp.sh <PROJECT_ID> <SERVICE_NAME>
-# 예시:   ./scripts/setup-gcp.sh my-gcp-project ylz-crm
+# 사용법: ./scripts/setup-gcp.sh <PROJECT_ID> <SERVICE_NAME> [GITHUB_OWNER] [GITHUB_REPO]
+# 예시:   ./scripts/setup-gcp.sh my-gcp-project ylz-crm my-org my-repo
 # ═══════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
 PROJECT_ID="${1:?프로젝트 ID를 입력하세요: ./scripts/setup-gcp.sh <PROJECT_ID> <SERVICE_NAME>}"
 SERVICE_NAME="${2:-ylz-crm}"
+GITHUB_OWNER="${3:-your-github-owner}"
+GITHUB_REPO="${4:-your-repo-name}"
 REGION="asia-northeast3"
 REPOSITORY="docker-repo"
 
@@ -44,13 +46,13 @@ if ! gcloud artifacts repositories describe "$REPOSITORY" --location="$REGION" &
     --description="Docker images for Cloud Run services"
   echo "  ✅ 저장소 생성 완료"
 else
-  echo "  ⏭️  저장소가 이미 존재합니다 (Doctor Engine과 공유)"
+  echo "  ⏭️  저장소가 이미 존재합니다"
 fi
 
 # 4. Secret Manager에 환경변수 등록
 echo ""
 echo "📌 [4/5] Secret Manager 환경변수 등록..."
-echo "  (YLZ CRM 전용 시크릿을 등록합니다 — Doctor Engine과 분리)"
+echo "  (이 앱 전용 시크릿을 등록합니다)"
 
 declare -A SECRETS=(
   ["YLZ_CRM_SUPABASE_URL"]="YLZ CRM Supabase 프로젝트 URL (https://xxx.supabase.co)"
@@ -106,7 +108,7 @@ echo ""
 echo "다음 단계:"
 echo "  1. Cloud Build 트리거 연결:"
 echo "     gcloud builds triggers create github \\"
-echo "       --repo-name=YLZ-CR- --repo-owner=aixlife \\"
+echo "       --repo-name=$GITHUB_REPO --repo-owner=$GITHUB_OWNER \\"
 echo "       --branch-pattern='^main$' \\"
 echo "       --build-config=cloudbuild.yaml"
 echo "  2. 또는 수동 첫 배포: ./scripts/deploy.sh $PROJECT_ID"
